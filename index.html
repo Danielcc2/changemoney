@@ -39,6 +39,15 @@
         button:hover {
             background-color: #0056b3;
         }
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -51,17 +60,48 @@
         </select>
         <button onclick="convert()">Convertir</button>
         <p id="result"></p>
+        <table id="exchangeTable">
+            <thead>
+                <tr>
+                    <th>Euros (€)</th>
+                    <th>Yenes (¥)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
     <script>
+        const apiKey = '61b6690809610377316f60aa'; // Reemplaza con tu clave de API
+
         function clearResult() {
             document.getElementById('result').innerText = '';
+        }
+
+        async function updateTable() {
+            const amounts = [1, 10, 30, 50, 100];
+            const url = `https://v6.exchangerate-api.com/v6/${apiKey}/pair/EUR/JPY`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.result === 'success') {
+                    const tbody = document.querySelector('#exchangeTable tbody');
+                    tbody.innerHTML = '';
+                    amounts.forEach(amount => {
+                        const result = amount * data.conversion_rate;
+                        const row = `<tr><td>${amount} €</td><td>${result.toFixed(2)} ¥</td></tr>`;
+                        tbody.innerHTML += row;
+                    });
+                }
+            } catch (error) {
+                console.error('Error al actualizar la tabla:', error);
+            }
         }
 
         async function convert() {
             const amountInput = document.getElementById('amount');
             const amount = amountInput.value;
             const conversionType = document.getElementById('conversionType').value;
-            const apiKey = '61b6690809610377316f60aa'; // Reemplaza con tu clave de API
 
             if (!amount || amount <= 0) {
                 document.getElementById('result').innerText = 'Por favor, ingresa una cantidad válida.';
@@ -81,6 +121,7 @@
                     const result = amount * data.conversion_rate;
                     document.getElementById('result').innerText = `${amount} ${conversionType === 'EURtoJPY' ? 'EUR' : 'JPY'} = ${result.toFixed(2)} ${conversionType === 'EURtoJPY' ? 'JPY' : 'EUR'}`;
                     amountInput.value = ''; // Borra el campo de entrada después de la conversión
+                    updateTable();
                 } else {
                     document.getElementById('result').innerText = 'Error: ' + data['error-type'];
                 }
@@ -89,6 +130,9 @@
                 document.getElementById('result').innerText = 'Error al conectar con la API. Verifica la clave o la conexión.';
             }
         }
+
+        setInterval(updateTable, 60000); // Actualiza la tabla cada minuto
+        updateTable(); // Actualización inicial
     </script>
 </body>
 </html>
