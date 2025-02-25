@@ -3,185 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor EUR ↔ JPY y Clima</title>
+    <title>Animated Weather Cards</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-container input {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: #333;
+            color: white;
+            width: 200px;
+        }
+
+        .search-container button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+        }
+
+        .weather-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .weather-card {
+            width: 200px;
+            height: 300px;
+            background: #2c2c2c;
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            color: #fff;
-            flex-direction: column;
-            gap: 20px;
         }
-        .container {
+
+        .weather-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
             text-align: center;
-            background: #fff;
-            color: #333;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            width: 400px;
         }
-        .weather-card {
-            width: 400px;
-            padding: 20px;
-            border-radius: 16px;
-            color: #fff;
+
+        .weather-card #time {
+            font-size: 0.9em;
             text-align: center;
-            position: relative;
-            transition: transform 0.3s ease;
-            overflow: hidden;
+            color: #bbb;
         }
-        .weather-card:hover {
-            transform: scale(1.05);
+
+        /* Wind Animation */
+        .wind .cloud {
+            position: absolute;
+            width: 50px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            top: 50px;
+            animation: moveCloud 4s linear infinite;
         }
-        
-        /* Animaciones para el clima */
+
+        @keyframes moveCloud {
+            0% { left: -60px; }
+            100% { left: 260px; }
+        }
+
+        .wind .wind-line {
+            position: absolute;
+            width: 30px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            animation: sway 2s ease-in-out infinite;
+        }
+
+        .wind .wind-line:nth-child(3) { top: 100px; left: 20px; }
+        .wind .wind-line:nth-child(4) { top: 120px; left: 80px; animation-delay: 0.5s; }
+        .wind .wind-line:nth-child(5) { top: 140px; left: 140px; animation-delay: 1s; }
+
+        @keyframes sway {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+
+        /* Rain Animation */
+        .rain .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: #4a90e2;
+            animation: fall 1s linear infinite;
+        }
+
+        .rain .raindrop:nth-child(3) { left: 40px; }
+        .rain .raindrop:nth-child(4) { left: 100px; animation-delay: 0.3s; }
+        .rain .raindrop:nth-child(5) { left: 160px; animation-delay: 0.6s; }
+
+        @keyframes fall {
+            0% { top: -20px; opacity: 1; }
+            100% { top: 300px; opacity: 0; }
+        }
+
+        /* Sun Animation */
         .sun {
-            background: radial-gradient(circle, rgba(255, 255, 0, 0.8), rgba(255, 165, 0, 0.5));
-            animation: pulseSun 2s infinite;
+            background: radial-gradient(circle at center, #ffeb3b 20%, #2c2c2c 70%);
         }
 
-        .rain {
-            background: linear-gradient(to right, #4facfe, #00c6ff);
-        }
-
-        .snow {
-            background: linear-gradient(to right, #ffffff, #b3e5fc);
-            color: #333;
-        }
-
-        .wind {
-            background: linear-gradient(to right, #a1c4fd, #c2e9fb);
-            animation: moveClouds 5s linear infinite;
-        }
-
-        /* Animación de sol pulsante */
-        @keyframes pulseSun {
-            0% {
-                background: radial-gradient(circle, rgba(255, 255, 0, 0.8), rgba(255, 165, 0, 0.5));
-            }
-            50% {
-                background: radial-gradient(circle, rgba(255, 255, 0, 1), rgba(255, 165, 0, 0.7));
-            }
-            100% {
-                background: radial-gradient(circle, rgba(255, 255, 0, 0.8), rgba(255, 165, 0, 0.5));
-            }
-        }
-
-        /* Animación de nubes moviéndose para el viento */
-        @keyframes moveClouds {
-            0% {
-                background-position: 0 0;
-            }
-            100% {
-                background-position: 100% 0;
-            }
-        }
-
-        /* Animación de lluvia */
-        .rain:before {
-            content: '';
+        .sun .ray {
             position: absolute;
-            top: 0;
+            width: 40px;
+            height: 2px;
+            background: rgba(255, 235, 59, 0.7);
+            top: 50%;
             left: 50%;
-            width: 100%;
-            height: 100%;
-            background: url('https://media.giphy.com/media/26F3Avz8v7bl7pd18/giphy.gif') repeat;
-            animation: rainFall 1s linear infinite;
+            transform-origin: left;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        @keyframes rainFall {
-            0% { top: -100%; }
-            100% { top: 100%; }
+        .sun .ray:nth-child(3) { transform: rotate(45deg); }
+        .sun .ray:nth-child(4) { transform: rotate(90deg); }
+        .sun .ray:nth-child(5) { transform: rotate(135deg); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
-        /* Animación de nieve */
-        .snowflakes {
+        /* Snow Animation */
+        .snow .snowflake {
             position: absolute;
-            top: 0;
-            left: 50%;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            animation: snowFall 10s linear infinite;
-        }
-
-        .snowflakes span {
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            background-color: #fff;
+            width: 8px;
+            height: 8px;
+            background: white;
             border-radius: 50%;
-            opacity: 0.8;
-            animation: snowMovement 10s linear infinite;
+            animation: snowFall 3s linear infinite;
         }
+
+        .snow .snowflake:nth-child(3) { left: 50px; }
+        .snow .snowflake:nth-child(4) { left: 120px; animation-delay: 1s; }
+        .snow .snowflake:nth-child(5) { left: 170px; animation-delay: 2s; }
 
         @keyframes snowFall {
-            0% { top: -10%; }
-            100% { top: 100%; }
-        }
-
-        @keyframes snowMovement {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(50px); }
-        }
-
-        input, button, select {
-            padding: 12px;
-            margin: 8px 0;
-            font-size: 16px;
-            width: calc(100% - 24px);
-            border: 2px solid #4facfe;
-            border-radius: 8px;
-            outline: none;
-        }
-        button {
-            cursor: pointer;
-            background: #4facfe;
-            color: white;
-            font-weight: bold;
-            border: none;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #00c6ff;
+            0% { top: -10px; opacity: 1; transform: rotate(0deg); }
+            100% { top: 300px; opacity: 0; transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Conversor de Moneda</h1>
-        <input type="number" id="amount" placeholder="Cantidad" min="0">
-        <select id="conversionType">
-            <option value="EURtoJPY">Euros a Yenes</option>
-            <option value="JPYtoEUR">Yenes a Euros</option>
-        </select>
-        <button onclick="convert()">Convertir</button>
-        <p id="result"></p>
-        <table id="exchangeTable">
-            <thead>
-                <tr><th>Euros (€)</th><th>Yenes (¥)</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
 
-    <div class="weather-card" id="weatherCard">
-        <h2 id="cityName">Tokyo, Japón</h2>
-        <p id="weatherDesc"></p>
-        <p id="temperature"></p>
-        <input type="text" id="cityInput" placeholder="Buscar otra ciudad">
+    <div class="search-container">
+        <input type="text" id="cityInput" placeholder="Buscar ciudad">
         <button onclick="getWeatherByInput()">Buscar</button>
     </div>
 
+    <div class="weather-container" id="weatherContainer"></div>
+
     <script>
         const weatherApiKey = '8a0952cfb27dbd8f1eac6e8180178e7b';
-        const forexApiKey = '61b6690809610377316f60aa';
 
         async function getWeather(city = 'Tokyo') {
             try {
@@ -189,46 +187,28 @@
                 const data = await response.json();
 
                 if (data.cod === 200) {
-                    document.getElementById('cityName').textContent = `${data.name}, ${data.sys.country}`;
                     const weather = data.weather[0].main.toLowerCase();
-                    const description = data.weather[0].description;
                     const temperature = `${data.main.temp} °C`;
+                    const description = data.weather[0].description;
 
-                    // Actualizamos el texto del estado del tiempo dependiendo del clima
-                    if (weather === 'clear') {
-                        document.getElementById('weatherDesc').textContent = `Hace sol y la temperatura es de ${temperature}.`;
-                    } else if (weather === 'rain') {
-                        document.getElementById('weatherDesc').textContent = `Está lloviendo, con ${description}.`;
-                    } else if (weather === 'snow') {
-                        document.getElementById('weatherDesc').textContent = `Está nevando, con ${description}.`;
-                    } else if (weather === 'wind') {
-                        document.getElementById('weatherDesc').textContent = `Hace viento, con ${description}.`;
-                    } else {
-                        document.getElementById('weatherDesc').textContent = `El clima es ${description}, con ${temperature}.`;
-                    }
+                    const weatherCard = document.createElement('div');
+                    weatherCard.classList.add('weather-card', weather);
 
-                    // Cambiar el fondo de la tarjeta dependiendo del clima
-                    const card = document.getElementById('weatherCard');
-                    if (weather === 'clear') {
-                        card.className = 'weather-card sun';  // Sol
-                    } else if (weather === 'rain') {
-                        card.className = 'weather-card rain'; // Lluvia
-                    } else if (weather === 'snow') {
-                        card.className = 'weather-card snow'; // Nieve
-                        const snowflakes = document.createElement('div');
-                        snowflakes.classList.add('snowflakes');
-                        for (let i = 0; i < 100; i++) {
-                            const snowflake = document.createElement('span');
-                            snowflake.style.animationDuration = `${Math.random() * 5 + 5}s`;
-                            snowflake.style.animationDelay = `${Math.random() * 5}s`;
-                            snowflakes.appendChild(snowflake);
-                        }
-                        card.appendChild(snowflakes);
-                    } else if (weather === 'wind') {
-                        card.className = 'weather-card wind'; // Viento
-                    } else {
-                        card.className = 'weather-card sun';  // Por defecto sol
-                    }
+                    const cityName = document.createElement('h2');
+                    cityName.textContent = `${data.name}, ${data.sys.country}`;
+
+                    const temp = document.createElement('p');
+                    temp.textContent = `Temperatura: ${temperature}`;
+
+                    const descriptionText = document.createElement('p');
+                    descriptionText.textContent = description;
+
+                    weatherCard.appendChild(cityName);
+                    weatherCard.appendChild(temp);
+                    weatherCard.appendChild(descriptionText);
+
+                    // Append the card to the weather container
+                    document.getElementById('weatherContainer').appendChild(weatherCard);
                 }
             } catch (error) {
                 console.error('Error al obtener el clima:', error);
@@ -237,60 +217,13 @@
 
         function getWeatherByInput() {
             const city = document.getElementById('cityInput').value.trim();
-            if (city) getWeather(city);
-        }
-
-        async function updateTable() {
-            const amounts = [1, 10, 30, 50, 100];
-            const url = `https://v6.exchangerate-api.com/v6/${forexApiKey}/pair/EUR/JPY`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.result === 'success') {
-                    const tbody = document.querySelector('#exchangeTable tbody');
-                    tbody.innerHTML = '';
-                    amounts.forEach(amount => {
-                        const result = amount * data.conversion_rate;
-                        const row = `<tr><td>${amount} €</td><td>${result.toFixed(2)} ¥</td></tr>`;
-                        tbody.innerHTML += row;
-                    });
-                }
-            } catch (error) {
-                console.error('Error al actualizar la tabla:', error);
+            if (city) {
+                document.getElementById('weatherContainer').innerHTML = '';  // Clear previous weather cards
+                getWeather(city);
             }
         }
 
-        async function convert() {
-            const amount = document.getElementById('amount').value;
-            const conversionType = document.getElementById('conversionType').value;
-
-            if (!amount || amount <= 0) {
-                document.getElementById('result').innerText = 'Por favor, ingresa una cantidad válida.';
-                return;
-            }
-
-            let url = `https://v6.exchangerate-api.com/v6/${forexApiKey}/pair/EUR/JPY`;
-            if (conversionType === 'JPYtoEUR') {
-                url = `https://v6.exchangerate-api.com/v6/${forexApiKey}/pair/JPY/EUR`;
-            }
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.result === 'success') {
-                    const result = amount * data.conversion_rate;
-                    document.getElementById('result').innerText = `${amount} ${conversionType === 'EURtoJPY' ? 'EUR' : 'JPY'} = ${result.toFixed(2)} ${conversionType === 'EURtoJPY' ? 'JPY' : 'EUR'}`;
-                    updateTable();
-                }
-            } catch (error) {
-                document.getElementById('result').innerText = 'Error al conectar con la API.';
-            }
-        }
-
-        setInterval(updateTable, 3600000);
-        updateTable();
+        // Cargar clima de la ciudad predeterminada al cargar la página
         getWeather();
     </script>
 </body>
