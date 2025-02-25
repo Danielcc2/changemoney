@@ -80,14 +80,27 @@
             padding: 8px;
             border: 1px solid #ddd;
         }
-        th {
+        .container th {
             background: #f4f4f4;
         }
-        .weather-card table th, .weather-card table td {
+        .weather-card table th {
+            background: rgba(255, 255, 255, 0.3); /* Fixed color for forecast table header */
             border-color: rgba(255, 255, 255, 0.5);
         }
-        .weather-card table th {
-            background: rgba(255, 255, 255, 0.2);
+        .weather-card table td {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .weather-card table tr.sun-row {
+            background: rgba(255, 204, 0, 0.2); /* Light sun color */
+        }
+        .weather-card table tr.rain-row {
+            background: rgba(79, 172, 254, 0.2); /* Light rain color */
+        }
+        .weather-card table tr.clouds-row {
+            background: rgba(176, 190, 197, 0.2); /* Light clouds color */
+        }
+        .weather-card table tr.snow-row {
+            background: rgba(179, 229, 252, 0.2); /* Light snow color */
         }
 
         /* Sun Animation */
@@ -253,11 +266,10 @@
     <script>
         const weatherApiKey = '8a0952cfb27dbd8f1eac6e8180178e7b';
         const forexApiKey = '61b6690809610377316f60aa';
-        let currentCity = 'Tokyo'; // Track the current city
+        let currentCity = 'Tokyo';
 
         async function getWeather(city = 'Tokyo') {
             try {
-                // Current weather
                 const currentResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=es&appid=${weatherApiKey}`);
                 const currentData = await currentResponse.json();
 
@@ -284,8 +296,8 @@
 
                     card.className = 'weather-card ' + weatherClass;
                     card.style.display = 'block';
-                    currentCity = city; // Update current city
-                    await getForecast(city); // Fetch forecast for the same city
+                    currentCity = city;
+                    await getForecast(city);
                 }
             } catch (error) {
                 console.error('Error al obtener el clima:', error);
@@ -299,27 +311,37 @@
 
                 if (forecastData.cod === '200') {
                     const tbody = document.querySelector('#forecastTable tbody');
-                    tbody.innerHTML = ''; // Clear previous forecast
+                    tbody.innerHTML = '';
 
-                    // Filter to get one entry per day (e.g., at 12:00)
                     const dailyForecasts = [];
                     const seenDates = new Set();
 
                     forecastData.list.forEach(item => {
-                        const date = item.dt_txt.split(' ')[0]; // Get YYYY-MM-DD
-                        const time = item.dt_txt.split(' ')[1]; // Get HH:MM:SS
+                        const date = item.dt_txt.split(' ')[0];
+                        const time = item.dt_txt.split(' ')[1];
                         if (time === '12:00:00' && !seenDates.has(date)) {
                             dailyForecasts.push(item);
                             seenDates.add(date);
                         }
                     });
 
-                    // Take first 5 days
                     dailyForecasts.slice(0, 5).forEach(day => {
                         const date = new Date(day.dt * 1000).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
                         const weather = day.weather[0].description;
                         const temp = day.main.temp.toFixed(1);
-                        const row = `<tr><td>${date}</td><td>${weather}</td><td>${temp}</td></tr>`;
+                        let rowClass = 'sun-row';
+
+                        if (weather.includes('lluvia') || weather.includes('llovizna')) {
+                            rowClass = 'rain-row';
+                        } else if (weather.includes('nieve')) {
+                            rowClass = 'snow-row';
+                        } else if (weather.includes('nub') || weather.includes('cubierto')) {
+                            rowClass = 'clouds-row';
+                        } else if (weather.includes('despejado')) {
+                            rowClass = 'sun-row';
+                        }
+
+                        const row = `<tr class="${rowClass}"><td>${date}</td><td>${weather}</td><td>${temp}</td></tr>`;
                         tbody.innerHTML += row;
                     });
                 }
