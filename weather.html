@@ -43,6 +43,7 @@
         .weather-card.rain { background: linear-gradient(to right, #4facfe, #00c6ff); }
         .weather-card.snow { background: linear-gradient(to right, #ffffff, #b3e5fc); color: #333; }
         .weather-card.wind { background: linear-gradient(to right, #a1c4fd, #c2e9fb); }
+        .weather-card.clouds { background: linear-gradient(to right, #b0bec5, #78909c); }
         input, button, select {
             padding: 12px;
             margin: 8px 0;
@@ -131,6 +132,23 @@
             0%, 100% { transform: translateX(0); }
             50% { transform: translateX(30px); }
         }
+
+        /* Clouds Animation */
+        .clouds .cloud {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            animation: moveCloud 5s linear infinite;
+        }
+        .clouds .cloud:nth-child(3) { top: 40px; left: 50px; }
+        .clouds .cloud:nth-child(4) { top: 60px; left: 150px; animation-delay: 2s; }
+        .clouds .cloud:nth-child(5) { top: 80px; left: 250px; animation-delay: 4s; }
+        @keyframes moveCloud {
+            0% { transform: translateX(-100px); opacity: 0.8; }
+            100% { transform: translateX(500px); opacity: 0.8; }
+        }
     </style>
 </head>
 <body>
@@ -170,6 +188,9 @@
         <div class="wind-line"></div>
         <div class="wind-line"></div>
         <div class="wind-line"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
     </div>
 
     <script>
@@ -187,8 +208,22 @@
                     document.getElementById('temperature').textContent = `${data.main.temp} °C`;
 
                     const card = document.getElementById('weatherCard');
-                    const weather = data.weather[0].main.toLowerCase();
-                    card.className = 'weather-card ' + (weather.includes('rain') ? 'rain' : weather.includes('snow') ? 'snow' : weather.includes('wind') ? 'wind' : 'sun');
+                    const weatherMain = data.weather[0].main.toLowerCase();
+                    let weatherClass = 'sun'; // Default to sun
+
+                    if (weatherMain.includes('rain')) {
+                        weatherClass = 'rain';
+                    } else if (weatherMain.includes('snow')) {
+                        weatherClass = 'snow';
+                    } else if (weatherMain.includes('wind')) {
+                        weatherClass = 'wind';
+                    } else if (weatherMain.includes('clouds')) {
+                        weatherClass = 'clouds';
+                    } else if (weatherMain.includes('clear')) {
+                        weatherClass = 'sun';
+                    }
+
+                    card.className = 'weather-card ' + weatherClass;
                 }
             } catch (error) {
                 console.error('Error al obtener el clima:', error);
