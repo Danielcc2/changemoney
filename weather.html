@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Weather Cards</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-container input {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: #333;
+            color: white;
+            width: 200px;
+        }
+
+        .search-container button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+        }
+
+        .weather-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .weather-card {
+            width: 200px;
+            height: 300px;
+            background: #2c2c2c;
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .weather-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .weather-card #time {
+            font-size: 0.9em;
+            text-align: center;
+            color: #bbb;
+        }
+
+        /* Wind Animation */
+        .wind .cloud {
+            position: absolute;
+            width: 50px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            top: 50px;
+            animation: moveCloud 4s linear infinite;
+        }
+
+        @keyframes moveCloud {
+            0% { left: -60px; }
+            100% { left: 260px; }
+        }
+
+        .wind .wind-line {
+            position: absolute;
+            width: 30px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            animation: sway 2s ease-in-out infinite;
+        }
+
+        .wind .wind-line:nth-child(3) { top: 100px; left: 20px; }
+        .wind .wind-line:nth-child(4) { top: 120px; left: 80px; animation-delay: 0.5s; }
+        .wind .wind-line:nth-child(5) { top: 140px; left: 140px; animation-delay: 1s; }
+
+        @keyframes sway {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+
+        /* Rain Animation */
+        .rain .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: #4a90e2;
+            animation: fall 1s linear infinite;
+        }
+
+        .rain .raindrop:nth-child(3) { left: 40px; }
+        .rain .raindrop:nth-child(4) { left: 100px; animation-delay: 0.3s; }
+        .rain .raindrop:nth-child(5) { left: 160px; animation-delay: 0.6s; }
+
+        @keyframes fall {
+            0% { top: -20px; opacity: 1; }
+            100% { top: 300px; opacity: 0; }
+        }
+
+        /* Sun Animation */
+        .sun {
+            background: radial-gradient(circle at center, #ffeb3b 20%, #2c2c2c 70%);
+        }
+
+        .sun .ray {
+            position: absolute;
+            width: 40px;
+            height: 2px;
+            background: rgba(255, 235, 59, 0.7);
+            top: 50%;
+            left: 50%;
+            transform-origin: left;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .sun .ray:nth-child(3) { transform: rotate(45deg); }
+        .sun .ray:nth-child(4) { transform: rotate(90deg); }
+        .sun .ray:nth-child(5) { transform: rotate(135deg); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Snow Animation */
+        .snow .snowflake {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: snowFall 3s linear infinite;
+        }
+
+        .snow .snowflake:nth-child(3) { left: 50px; }
+        .snow .snowflake:nth-child(4) { left: 120px; animation-delay: 1s; }
+        .snow .snowflake:nth-child(5) { left: 170px; animation-delay: 2s; }
+
+        @keyframes snowFall {
+            0% { top: -10px; opacity: 1; transform: rotate(0deg); }
+            100% { top: 300px; opacity: 0; transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" id="cityInput" placeholder="Search any city">
+        <button onclick="updateCity()">Search</button>
+    </div>
+    <div class="weather-container">
+        <div class="weather-card wind">
+            <h2>Wind</h2>
+            <p id="time-wind">Loading...</p>
+            <div class="cloud"></div>
+            <div class="wind-line"></div>
+            <div class="wind-line"></div>
+            <div class="wind-line"></div>
+        </div>
+        <div class="weather-card rain">
+            <h2>Rain</h2>
+            <p id="time-rain">Loading...</p>
+            <div class="raindrop"></div>
+            <div class="raindrop"></div>
+            <div class="raindrop"></div>
+        </div>
+        <div class="weather-card sun">
+            <h2>Sun</h2>
+            <p id="time-sun">Loading...</p>
+            <div class="ray"></div>
+            <div class="ray"></div>
+            <div class="ray"></div>
+        </div>
+        <div class="weather-card snow">
+            <h2>Snow</h2>
+            <p id="time-snow">Loading...</p>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "8a0952cfb27dbd8f1eac6e8180178e7b"; // Replace with your OpenWeatherMap API key
+        let currentCity = "Tokyo";
+
+        function updateTime(lat, lon, elementId) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const timezoneOffset = data.timezone; // Offset in seconds
+                    const now = new Date();
+                    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+                    const localTime = new Date(utcTime + (timezoneOffset * 1000));
+                    
+                    const timeString = localTime.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    document.getElementById(elementId).textContent = `${currentCity} Time: ${timeString}`;
+                })
+                .catch(error => {
+                    document.getElementById(elementId).textContent = "Time unavailable";
+                    console.error("Error fetching time:", error);
+                });
+        }
+
+        function updateCity() {
+            const newCity = document.getElementById("cityInput").value.trim();
+            if (newCity) {
+                currentCity = newCity;
+                fetch(`https://api.openweathermap.org/data/2.5/weather?q=${currentCity}&appid=${apiKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const { lat, lon } = data.coord;
+                        updateAllTimes(lat, lon);
+                    })
+                    .catch(error => {
+                        alert("City not found!");
+                        console.error("Error fetching coordinates:", error);
+                    });
+            }
+        }
+
+        function updateAllTimes(lat, lon) {
+            updateTime(lat, lon, "time-wind");
+            updateTime(lat, lon, "time-rain");
+            updateTime(lat, lon, "time-sun");
+            updateTime(lat, lon, "time-snow");
+        }
+
+        // Initialize with Tokyo coordinates (default)
+        const tokyoLat = 35.6762;
+        const tokyoLon = 139.6503;
+        updateAllTimes(tokyoLat, tokyoLon);
+
+        // Update time every second
+        setInterval(() => {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${currentCity}&appid=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const { lat, lon } = data.coord;
+                    updateAllTimes(lat, lon);
+                });
+        }, 1000);
+    </script>
+</body>
+</html>
