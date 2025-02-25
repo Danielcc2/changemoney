@@ -32,25 +32,105 @@
             border-radius: 16px;
             color: #fff;
             text-align: center;
+            position: relative;
             transition: transform 0.3s ease;
+            overflow: hidden;
         }
         .weather-card:hover {
             transform: scale(1.05);
         }
-        .weather-card.sun { 
-            background: linear-gradient(to right, #ffcc00, #ff9900); /* Fondo soleado */
+        
+        /* Animaciones para el clima */
+        .sun {
+            background: radial-gradient(circle, rgba(255, 255, 0, 0.8), rgba(255, 165, 0, 0.5));
+            animation: pulseSun 2s infinite;
+        }
+
+        .rain {
+            background: linear-gradient(to right, #4facfe, #00c6ff);
+        }
+
+        .snow {
+            background: linear-gradient(to right, #ffffff, #b3e5fc);
             color: #333;
         }
-        .weather-card.rain { 
-            background: linear-gradient(to right, #4facfe, #00c6ff); /* Fondo lluvioso */
+
+        .wind {
+            background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+            animation: moveClouds 5s linear infinite;
         }
-        .weather-card.snow { 
-            background: linear-gradient(to right, #ffffff, #b3e5fc); /* Fondo nevado */
-            color: #333;
+
+        /* Animación de sol pulsante */
+        @keyframes pulseSun {
+            0% {
+                background: radial-gradient(circle, rgba(255, 255, 0, 0.8), rgba(255, 165, 0, 0.5));
+            }
+            50% {
+                background: radial-gradient(circle, rgba(255, 255, 0, 1), rgba(255, 165, 0, 0.7));
+            }
+            100% {
+                background: radial-gradient(circle, rgba(255, 255, 0, 0.8), rgba(255, 165, 0, 0.5));
+            }
         }
-        .weather-card.wind { 
-            background: linear-gradient(to right, #a1c4fd, #c2e9fb); /* Fondo ventoso */
+
+        /* Animación de nubes moviéndose para el viento */
+        @keyframes moveClouds {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 100% 0;
+            }
         }
+
+        /* Animación de lluvia */
+        .rain:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: url('https://media.giphy.com/media/26F3Avz8v7bl7pd18/giphy.gif') repeat;
+            animation: rainFall 1s linear infinite;
+        }
+
+        @keyframes rainFall {
+            0% { top: -100%; }
+            100% { top: 100%; }
+        }
+
+        /* Animación de nieve */
+        .snowflakes {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            animation: snowFall 10s linear infinite;
+        }
+
+        .snowflakes span {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: snowMovement 10s linear infinite;
+        }
+
+        @keyframes snowFall {
+            0% { top: -10%; }
+            100% { top: 100%; }
+        }
+
+        @keyframes snowMovement {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50px); }
+        }
+
         input, button, select {
             padding: 12px;
             margin: 8px 0;
@@ -130,15 +210,24 @@
                     // Cambiar el fondo de la tarjeta dependiendo del clima
                     const card = document.getElementById('weatherCard');
                     if (weather === 'clear') {
-                        card.className = 'weather-card sun';  // Para sol, no aplicamos animación
+                        card.className = 'weather-card sun';  // Sol
                     } else if (weather === 'rain') {
-                        card.className = 'weather-card rain'; // Para lluvia
+                        card.className = 'weather-card rain'; // Lluvia
                     } else if (weather === 'snow') {
-                        card.className = 'weather-card snow'; // Para nieve
+                        card.className = 'weather-card snow'; // Nieve
+                        const snowflakes = document.createElement('div');
+                        snowflakes.classList.add('snowflakes');
+                        for (let i = 0; i < 100; i++) {
+                            const snowflake = document.createElement('span');
+                            snowflake.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                            snowflake.style.animationDelay = `${Math.random() * 5}s`;
+                            snowflakes.appendChild(snowflake);
+                        }
+                        card.appendChild(snowflakes);
                     } else if (weather === 'wind') {
-                        card.className = 'weather-card wind'; // Para viento
+                        card.className = 'weather-card wind'; // Viento
                     } else {
-                        card.className = 'weather-card sun';  // Por defecto, sol
+                        card.className = 'weather-card sun';  // Por defecto sol
                     }
                 }
             } catch (error) {
