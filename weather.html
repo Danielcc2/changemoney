@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversor EUR ↔ JPY y Clima</title>
     <style>
         body {
@@ -84,26 +84,19 @@
             background: #f4f4f4;
         }
         .weather-card table th {
-            background: rgba(255, 255, 255, 0.3); /* Fixed header color */
+            background: rgba(255, 255, 255, 0.3);
             border-color: rgba(255, 255, 255, 0.5);
         }
         .weather-card table td {
             border-color: rgba(255, 255, 255, 0.5);
         }
-        .weather-card table tr.sun-row {
-            background: rgba(255, 255, 0, 0.5); /* Yellow for sun */
-        }
-        .weather-card table tr.rain-row {
-            background: rgba(0, 0, 255, 0.5); /* Blue for rain */
-        }
-        .weather-card table tr.clouds-row {
-            background: rgba(176, 190, 197, 0.2); /* Gray for clouds (unchanged) */
-        }
-        .weather-card table tr.snow-row {
-            background: rgba(128, 0, 128, 0.5); /* Purple for snow */
-        }
+        .weather-card table tr.sun-row { background: rgba(255, 255, 0, 0.5); }
+        .weather-card table tr.rain-row { background: rgba(0, 0, 255, 0.5); }
+        .weather-card table tr.clouds-row { background: rgba(176, 190, 197, 0.2); }
+        .weather-card table tr.snow-row { background: rgba(128, 0, 128, 0.5); }
 
-        /* Sun Animation */
+        /* Animation Elements */
+        .ray, .raindrop, .snowflake, .wind-line, .cloud { display: none; } /* Hidden by default */
         .sun .ray {
             position: absolute;
             width: 40px;
@@ -122,7 +115,6 @@
             50% { opacity: 1; }
         }
 
-        /* Rain Animation */
         .rain .raindrop {
             position: absolute;
             width: 2px;
@@ -138,7 +130,6 @@
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Snow Animation */
         .snow .snowflake {
             position: absolute;
             width: 8px;
@@ -155,7 +146,6 @@
             100% { top: 100%; opacity: 0; transform: rotate(360deg); }
         }
 
-        /* Wind Animation */
         .wind .wind-line {
             position: absolute;
             width: 40px;
@@ -171,7 +161,6 @@
             50% { transform: translateX(30px); }
         }
 
-        /* Clouds Animation */
         .clouds .cloud {
             position: absolute;
             width: 60px;
@@ -188,118 +177,100 @@
             100% { transform: translateX(150%); opacity: 0.8; }
         }
 
-        /* Media Queries for Mobile */
         @media (max-width: 600px) {
-            body {
-                margin: 10px;
-                gap: 15px;
-            }
-            .container, .weather-card {
-                padding: 15px;
-                margin: 5px;
-                width: 95%;
-            }
-            input, button, select {
-                padding: 8px;
-                font-size: 14px;
-            }
-            h1, h2 {
-                font-size: 1.2em;
-            }
-            p {
-                font-size: 0.9em;
-            }
-            table {
-                font-size: 0.9em;
-            }
+            body { margin: 10px; gap: 15px; }
+            .container, .weather-card { padding: 15px; margin: 5px; width: 95%; }
+            input, button, select { padding: 8px; font-size: 14px; }
+            h1, h2 { font-size: 1.2em; }
+            p { font-size: 0.9em; }
+            table { font-size: 0.9em; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Conversor de Moneda</h1>
-        <input type="number" id="amount" placeholder="Cantidad" min="0">
-        <select id="conversionType">
+        <input type="number" id="amount" placeholder="Cantidad" min="0" aria-label="Cantidad a convertir">
+        <select id="conversionType" aria-label="Tipo de conversión">
             <option value="EURtoJPY">Euros a Yenes</option>
             <option value="JPYtoEUR">Yenes a Euros</option>
         </select>
-        <button onclick="convert()">Convertir</button>
-        <p id="result"></p>
+        <button onclick="convert()" aria-label="Convertir moneda">Convertir</button>
+        <p id="result" aria-live="polite"></p>
         <table id="exchangeTable">
             <thead>
                 <tr><th>Euros (€)</th><th>Yenes (¥)</th></tr>
             </thead>
             <tbody></tbody>
         </table>
+        <button onclick="updateTable()" aria-label="Actualizar tabla de conversión">Actualizar Tabla</button> <!-- Added manual refresh -->
     </div>
 
     <div class="weather-card" id="weatherCard">
         <h2 id="cityName">Tokyo, Japón</h2>
-        <p id="weatherDesc"></p>
-        <p id="temperature"></p>
-        <input type="text" id="cityInput" placeholder="Buscar otra ciudad">
-        <button onclick="getWeatherByInput()">Buscar</button>
+        <p id="weatherDesc" aria-live="polite"></p>
+        <p id="temperature" aria-live="polite"></p>
+        <input type="text" id="cityInput" placeholder="Buscar otra ciudad" aria-label="Buscar ciudad para el clima">
+        <button onclick="getWeatherByInput()" aria-label="Buscar clima">Buscar</button>
         <table id="forecastTable">
             <thead>
                 <tr><th>Fecha</th><th>Tiempo</th><th>Temp (°C)</th></tr>
             </thead>
             <tbody></tbody>
         </table>
-        <!-- Animation elements -->
-        <div class="ray"></div>
-        <div class="ray"></div>
-        <div class="ray"></div>
-        <div class="raindrop"></div>
-        <div class="raindrop"></div>
-        <div class="raindrop"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="wind-line"></div>
-        <div class="wind-line"></div>
-        <div class="wind-line"></div>
-        <div class="cloud"></div>
-        <div class="cloud"></div>
-        <div class="cloud"></div>
+        <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+        <div class="raindrop"></div><div class="raindrop"></div><div class="raindrop"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="wind-line"></div><div class="wind-line"></div><div class="wind-line"></div>
+        <div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
     </div>
 
     <script>
+        // Note: API keys are still hardcoded for this example. In production, use a backend proxy or environment variables.
         const weatherApiKey = '8a0952cfb27dbd8f1eac6e8180178e7b';
         const forexApiKey = '61b6690809610377316f60aa';
         let currentCity = 'Tokyo';
+        let debounceTimeout;
+
+        // Toggle animations based on weather condition
+        function toggleAnimations(weatherClass) {
+            document.querySelectorAll('.ray, .raindrop, .snowflake, .wind-line, .cloud').forEach(el => el.style.display = 'none');
+            document.querySelectorAll(`.${weatherClass} .${weatherClass === 'sun' ? 'ray' : weatherClass}`).forEach(el => el.style.display = 'block');
+        }
 
         async function getWeather(city = 'Tokyo') {
             try {
                 const currentResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=es&appid=${weatherApiKey}`);
                 const currentData = await currentResponse.json();
 
-                if (currentData.cod === 200) {
-                    document.getElementById('cityName').textContent = `${currentData.name}, ${currentData.sys.country}`;
-                    document.getElementById('weatherDesc').textContent = currentData.weather[0].description;
-                    document.getElementById('temperature').textContent = `${currentData.main.temp} °C`;
-
-                    const card = document.getElementById('weatherCard');
-                    const weatherMain = currentData.weather[0].main.toLowerCase();
-                    let weatherClass = 'sun';
-
-                    if (weatherMain.includes('rain')) {
-                        weatherClass = 'rain';
-                    } else if (weatherMain.includes('snow')) {
-                        weatherClass = 'snow';
-                    } else if (weatherMain.includes('wind')) {
-                        weatherClass = 'wind';
-                    } else if (weatherMain.includes('clouds')) {
-                        weatherClass = 'clouds';
-                    } else if (weatherMain.includes('clear')) {
-                        weatherClass = 'sun';
-                    }
-
-                    card.className = 'weather-card ' + weatherClass;
-                    card.style.display = 'block';
-                    currentCity = city;
-                    await getForecast(city);
+                if (currentData.cod !== 200) {
+                    document.getElementById('weatherDesc').textContent = 'Ciudad no encontrada.';
+                    document.getElementById('temperature').textContent = '';
+                    document.getElementById('forecastTable').querySelector('tbody').innerHTML = '';
+                    return;
                 }
+
+                document.getElementById('cityName').textContent = `${currentData.name}, ${currentData.sys.country}`;
+                document.getElementById('weatherDesc').textContent = currentData.weather[0].description;
+                document.getElementById('temperature').textContent = `${currentData.main.temp} °C`;
+
+                const card = document.getElementById('weatherCard');
+                const weatherMain = currentData.weather[0].main.toLowerCase();
+                let weatherClass = 'sun';
+
+                if (weatherMain.includes('rain')) weatherClass = 'rain';
+                else if (weatherMain.includes('snow')) weatherClass = 'snow';
+                else if (weatherMain.includes('wind')) weatherClass = 'wind';
+                else if (weatherMain.includes('clouds')) weatherClass = 'clouds';
+                else if (weatherMain.includes('clear')) weatherClass = 'sun';
+
+                card.className = 'weather-card ' + weatherClass;
+                toggleAnimations(weatherClass); // Toggle animations
+                card.style.display = 'block';
+                currentCity = city;
+                await getForecast(city);
             } catch (error) {
+                document.getElementById('weatherDesc').textContent = 'Error al obtener el clima.';
                 console.error('Error al obtener el clima:', error);
             }
         }
@@ -309,50 +280,51 @@
                 const forecastResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&lang=es&appid=${weatherApiKey}`);
                 const forecastData = await forecastResponse.json();
 
-                if (forecastData.cod === '200') {
-                    const tbody = document.querySelector('#forecastTable tbody');
-                    tbody.innerHTML = '';
-
-                    const dailyForecasts = [];
-                    const seenDates = new Set();
-
-                    forecastData.list.forEach(item => {
-                        const date = item.dt_txt.split(' ')[0];
-                        const time = item.dt_txt.split(' ')[1];
-                        if (time === '12:00:00' && !seenDates.has(date)) {
-                            dailyForecasts.push(item);
-                            seenDates.add(date);
-                        }
-                    });
-
-                    dailyForecasts.slice(0, 5).forEach(day => {
-                        const date = new Date(day.dt * 1000).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-                        const weather = day.weather[0].description;
-                        const temp = day.main.temp.toFixed(1);
-                        let rowClass = 'sun-row';
-
-                        if (weather.includes('lluvia') || weather.includes('llovizna')) {
-                            rowClass = 'rain-row';
-                        } else if (weather.includes('nieve')) {
-                            rowClass = 'snow-row';
-                        } else if (weather.includes('nub') || weather.includes('cubierto')) {
-                            rowClass = 'clouds-row';
-                        } else if (weather.includes('despejado')) {
-                            rowClass = 'sun-row';
-                        }
-
-                        const row = `<tr class="${rowClass}"><td>${date}</td><td>${weather}</td><td>${temp}</td></tr>`;
-                        tbody.innerHTML += row;
-                    });
+                if (forecastData.cod !== '200') {
+                    document.getElementById('forecastTable').querySelector('tbody').innerHTML = '';
+                    return;
                 }
+
+                const tbody = document.querySelector('#forecastTable tbody');
+                tbody.innerHTML = '';
+
+                const dailyForecasts = [];
+                const seenDates = new Set();
+
+                forecastData.list.forEach(item => {
+                    const date = item.dt_txt.split(' ')[0];
+                    const time = item.dt_txt.split(' ')[1];
+                    if (time === '12:00:00' && !seenDates.has(date)) {
+                        dailyForecasts.push(item);
+                        seenDates.add(date);
+                    }
+                });
+
+                dailyForecasts.slice(0, 5).forEach(day => {
+                    const date = new Date(day.dt * 1000).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+                    const weather = day.weather[0].description;
+                    const temp = day.main.temp.toFixed(1);
+                    let rowClass = 'sun-row';
+
+                    if (weather.includes('lluvia') || weather.includes('llovizna')) rowClass = 'rain-row';
+                    else if (weather.includes('nieve')) rowClass = 'snow-row';
+                    else if (weather.includes('nub') || weather.includes('cubierto')) rowClass = 'clouds-row';
+                    else if (weather.includes('despejado')) rowClass = 'sun-row';
+
+                    const row = `<tr class="${rowClass}"><td>${date}</td><td>${weather}</td><td>${temp}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
             } catch (error) {
                 console.error('Error al obtener la previsión:', error);
             }
         }
 
         function getWeatherByInput() {
-            const city = document.getElementById('cityInput').value.trim();
-            if (city) getWeather(city);
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                const city = document.getElementById('cityInput').value.trim();
+                if (city) getWeather(city);
+            }, 500); // Debounce delay of 500ms
         }
 
         async function updateTable() {
@@ -370,19 +342,22 @@
                         const row = `<tr><td>${amount} €</td><td>${result.toFixed(2)} ¥</td></tr>`;
                         tbody.innerHTML += row;
                     });
+                } else {
+                    document.getElementById('result').textContent = 'Error al actualizar la tabla.';
                 }
             } catch (error) {
+                document.getElementById('result').textContent = 'Error al conectar con la API de conversión.';
                 console.error('Error al actualizar la tabla:', error);
             }
         }
 
         async function convert() {
             const amountInput = document.getElementById('amount');
-            const amount = amountInput.value;
+            const amount = parseFloat(amountInput.value);
             const conversionType = document.getElementById('conversionType').value;
 
-            if (!amount || amount <= 0) {
-                document.getElementById('result').innerText = 'Por favor, ingresa una cantidad válida.';
+            if (!amount || isNaN(amount) || amount <= 0) {
+                document.getElementById('result').textContent = 'Por favor, ingresa una cantidad válida mayor que 0.';
                 return;
             }
 
@@ -397,17 +372,20 @@
 
                 if (data.result === 'success') {
                     const result = amount * data.conversion_rate;
-                    document.getElementById('result').innerText = `${amount} ${conversionType === 'EURtoJPY' ? 'EUR' : 'JPY'} = ${result.toFixed(2)} ${conversionType === 'EURtoJPY' ? 'JPY' : 'EUR'}`;
+                    document.getElementById('result').textContent = `${amount} ${conversionType === 'EURtoJPY' ? 'EUR' : 'JPY'} = ${result.toFixed(2)} ${conversionType === 'EURtoJPY' ? 'JPY' : 'EUR'}`;
                     await updateTable();
                     amountInput.value = '';
+                } else {
+                    document.getElementById('result').textContent = 'Error en la conversión.';
                 }
             } catch (error) {
-                document.getElementById('result').innerText = 'Error al conectar con la API.';
+                document.getElementById('result').textContent = 'Error al conectar con la API.';
                 console.error('Error en la conversión:', error);
             }
         }
 
-        setInterval(updateTable, 3600000);
+        // Initial setup
+        setInterval(updateTable, 3600000); // Hourly update
         updateTable();
         getWeather();
     </script>
