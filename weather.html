@@ -323,7 +323,6 @@
                 if (data.result === 'success') {
                     const result = amount * data.conversion_rate;
                     document.getElementById('result').innerText = `${amount} ${conversionType === 'EURtoJPY' ? 'EUR' : 'JPY'} = ${result.toFixed(2)} ${conversionType === 'EURtoJPY' ? 'JPY' : 'EUR'}`;
-                    amountInput.value = '';
                     await updateTable(); // Ensure table updates after conversion
                     
                 }
