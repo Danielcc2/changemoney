@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- Prevent zoom on focus -->
     <title>Conversor EUR ↔ JPY y Clima</title>
     <style>
         body {
@@ -10,37 +10,37 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Changed height to min-height for better mobile compatibility */
-            margin: 20px; /* Reduced margin for smaller screens */
+            min-height: 100vh;
+            margin: 20px;
             background: linear-gradient(to right, #4facfe, #00f2fe);
             color: #fff;
             flex-direction: column;
-            gap: 20px; /* Reduced gap for mobile */
+            gap: 20px;
         }
         .container {
             text-align: center;
             background: #fff;
             color: #333;
-            padding: 20px; /* Reduced padding for smaller screens */
+            padding: 20px;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            width: 90%; /* Changed to percentage for responsiveness */
-            max-width: 400px; /* Added max-width to limit on larger screens */
-            margin: 10px; /* Reduced margin */
-            box-sizing: border-box; /* Ensures padding doesn't increase width */
+            width: 90%;
+            max-width: 400px;
+            margin: 10px;
+            box-sizing: border-box;
         }
         .weather-card {
-            width: 90%; /* Changed to percentage for responsiveness */
-            max-width: 400px; /* Added max-width to limit on larger screens */
-            padding: 20px; /* Reduced padding for smaller screens */
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
             border-radius: 16px;
             color: #fff;
             text-align: center;
             transition: transform 0.3s ease;
             position: relative;
             overflow: hidden;
-            margin: 10px; /* Reduced margin */
-            box-sizing: border-box; /* Ensures padding doesn't increase width */
+            margin: 10px;
+            box-sizing: border-box;
         }
         .weather-card:hover {
             transform: scale(1.05);
@@ -51,10 +51,10 @@
         .weather-card.wind { background: linear-gradient(to right, #a1c4fd, #c2e9fb); }
         .weather-card.clouds { background: linear-gradient(to right, #b0bec5, #78909c); }
         input, button, select {
-            padding: 10px; /* Slightly reduced padding */
-            margin: 6px 0; /* Reduced margin */
-            font-size: 14px; /* Reduced font size for mobile */
-            width: calc(100% - 20px); /* Adjusted for smaller padding */
+            padding: 10px;
+            margin: 6px 0;
+            font-size: 16px; /* Increased to prevent zoom on mobile */
+            width: calc(100% - 20px);
             border: 2px solid #4facfe;
             border-radius: 8px;
             outline: none;
@@ -70,6 +70,18 @@
         }
         button:hover {
             background: #00c6ff;
+        }
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #f4f4f4;
         }
 
         /* Sun Animation */
@@ -170,12 +182,15 @@
             }
             input, button, select {
                 padding: 8px;
-                font-size: 12px;
+                font-size: 14px; /* Slightly smaller but still legible */
             }
             h1, h2 {
                 font-size: 1.2em;
             }
             p {
+                font-size: 0.9em;
+            }
+            table {
                 font-size: 0.9em;
             }
         }
@@ -239,7 +254,7 @@
 
                     const card = document.getElementById('weatherCard');
                     const weatherMain = data.weather[0].main.toLowerCase();
-                    let weatherClass = 'sun'; // Default to sun
+                    let weatherClass = 'sun';
 
                     if (weatherMain.includes('rain')) {
                         weatherClass = 'rain';
@@ -254,7 +269,7 @@
                     }
 
                     card.className = 'weather-card ' + weatherClass;
-                    card.style.display = 'block'; // Ensure the card is visible
+                    card.style.display = 'block';
                 }
             } catch (error) {
                 console.error('Error al obtener el clima:', error);
@@ -308,16 +323,17 @@
                 if (data.result === 'success') {
                     const result = amount * data.conversion_rate;
                     document.getElementById('result').innerText = `${amount} ${conversionType === 'EURtoJPY' ? 'EUR' : 'JPY'} = ${result.toFixed(2)} ${conversionType === 'EURtoJPY' ? 'JPY' : 'EUR'}`;
-                    updateTable();
+                    await updateTable(); // Ensure table updates after conversion
                 }
             } catch (error) {
                 document.getElementById('result').innerText = 'Error al conectar con la API.';
+                console.error('Error en la conversión:', error);
             }
         }
 
-        setInterval(updateTable, 3600000);
-        updateTable();
-        getWeather();
+        setInterval(updateTable, 3600000); // Update every hour
+        updateTable(); // Initial table load
+        getWeather(); // Initial weather load
     </script>
 </body>
 </html>
