@@ -384,10 +384,54 @@
             }
         }
 
+        // Contador de visitas
+        function updateVisitorCounter() {
+        let visitCount = localStorage.getItem("total_visits");
+        
+        // Comprobar si existe el contador
+        if (visitCount) {
+            visitCount = Number(visitCount) + 1;
+        } else {
+            visitCount = 1;
+        }
+        
+        localStorage.setItem("total_visits", visitCount);
+        document.getElementById('visitorCounter').innerHTML = 
+            `Total de visitas: <strong>${visitCount}</strong>`;
+        }
+        
+        // Simulación de usuarios en línea
+        function simulateOnlineUsers() {
+            // Base de usuarios (entre 5-15)
+            let baseUsers = 5 + Math.floor(Math.random() * 10);
+            
+            // Obtener hora del día para simular diferentes cantidades de usuarios
+            const hour = new Date().getHours();
+            const dayOfWeek = new Date().getDay();
+            
+            // Más usuarios durante horas laborables (9-18h) en días laborables
+            if (hour >= 9 && hour < 18 && dayOfWeek >= 1 && dayOfWeek <= 5) {
+                baseUsers += 10 + Math.floor(Math.random() * 20);
+            }
+            
+            // Actualizar contador inicial
+            document.getElementById("onlineUsers").textContent = `Usuarios en línea: ${baseUsers}`;
+            
+            // Añadir variación aleatoria cada 30 segundos
+            setInterval(() => {
+                const variation = Math.floor(Math.random() * 5) - 2; // -2 a +2
+                baseUsers = Math.max(1, baseUsers + variation);
+                document.getElementById("onlineUsers").textContent = `Usuarios en línea: ${baseUsers}`;
+            }, 30000);
+        }
+
+
         // Initial setup
         setInterval(updateTable, 3600000); // Hourly update
         updateTable();
         getWeather();
+        updateVisitorCounter();
+        simulateOnlineUsers();
     </script>
 </body>
 </html>
