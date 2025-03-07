@@ -397,6 +397,19 @@
             }
         }
 
+
+        //usuarios online
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        import { createClient } from '@supabase/supabase-js'
+
+        // Inicializa Supabase con las credenciales de tu proyecto
+        const supabase = createClient(
+          'https://hhppirbdfutxsmmeayhd.supabase.co',  // URL del proyecto
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhocHBpcmJkZnV0eHNtbWVheWhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNDUzOTQsImV4cCI6MjA1NjkyMTM5NH0.p3lYhVlHauQaSVenJ5pIGfU8GbeCRti5nkYQr_fXIAM'  // Clave anónima
+        )
+        
+        export default supabase
+
         
         
             
